@@ -1,0 +1,4 @@
+# Custom values added on top of the existing values.yaml
+
+namespace: kind-airflow
+
