@@ -132,7 +132,10 @@ I am in those for whom that trick did not work.
 
 Interestingly, in these issues once can find reference to articles with headlines " **Airflow in Kubernetes in 10 mins**". This IMO is one of the cause of such issues. People are led to beleive that all is just so simple.
 
-### Attempt2
+## Attempt 2 leading to same issue
+
+<details>
+  <summary> Click to expand</summary>
 
 Cleanup
 
@@ -156,7 +159,13 @@ start again
   helm install $RELEASE_NAME apache-airflow/airflow --namespace $NS --debug
   ```
 
-**Same issue again**. let the Sherlock lose on the problem.
+</details>
+
+## Same issue again. let the Sherlock lose on investigation
+
+<details>
+
+<summary>click to expand</summary>
 
 1. Check pods. All are in `ImagePullBackOff` status
 
@@ -308,6 +317,7 @@ start again
         1  172.19.0.1 (172.19.0.1)  0.246 ms  0.010 ms  0.006 ms
         2  arunpc.mshome.net (172.17.112.1)  0.193 ms  0.145 ms  0.208 ms
         3  speedport.ip (192.168.1.1)  2.803 ms  2.778 ms  2.733 ms
+
         ```
 
         however traceroute to IP address as given by WSL host is working.
@@ -329,6 +339,8 @@ start again
     $root@kind-airflow-worker:/ ping merriam-webster.com
     PING merriam-webster.com (65.9.20.55) 56(84) bytes of data.
     64 bytes from server-65-9-20-55.zag50.r.cloudfront.net (65.9.20.55): icmp_seq=1 ttl=243 time=18.2 ms
+    $root@kind-airflow-worker:/ ping ghcr.io
+    PING ghcr.io (140.82.121.33) 56(84) bytes of data.
     ```
 
 15. There are some articles that talks about hyphens and underscores in hostnames. But none that could specify why just a specific host won't work. As my knowledge of networks is limited, so I have not clue what could I do. So, i tried to setup `/etc/resolve.conf` in Kind node image same as it is for the WSL Debian host where docker/kind is running and give it a try. It works!!!.
@@ -347,3 +359,5 @@ start again
     ```
 
 16. But why? Where is the block for registry-1.docker.io in the original/default setup when everything else is working? This may be a search later, but for now need to see what can I need to change so that this change remains in the node image even when I delete the kind cluster and restart it. Is it a docker change or something need to be added to the kind cluster's config.yaml? as I change in docker then it will be for every docker/kind instance. Maybe better to find image/cluster specific solution.
+
+</details>
