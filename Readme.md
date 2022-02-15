@@ -360,4 +360,121 @@ start again
 
 16. But why? Where is the block for registry-1.docker.io in the original/default setup when everything else is working? This may be a search later, but for now need to see what can I need to change so that this change remains in the node image even when I delete the kind cluster and restart it. Is it a docker change or something need to be added to the kind cluster's config.yaml? as I change in docker then it will be for every docker/kind instance. Maybe better to find image/cluster specific solution.
 
+## Solved
+
+After 2 days of trying to find the rootcause of the issue, I tried to change change the Kind node images [Procedure details below](#alternate-way-change-the-node-image-version-once-again). That solution worked without problems.
+
+I came to this node image version again i.e. 1.20 and started the cluster again. This time I could reach out to the registry-1.docker.io!
+
+Once tested I tried to install airflow with helm and that worked as well!
+
+Temporary glitch or the node image version 1.23 changed somthing somewhere in the confgiuration? I have no clue, but for now I can reproduce the issue...
+
+
 </details>
+
+## Alternate way: Change the node image version. once again!
+
+<details>
+
+<summary>
+click to expland
+</summary>
+
+As I am new to kubernetes, kind, docker and not much of an expert of networking too, so it takes long time to investigate issues. While I was thinking and searching for solution, it occured to me, that may be I can change the node image again. The original kind cluster was based on node image 1.20, [because 1.21 had issues.](https://github.com/arundeep78/wsl_debian_dev/blob/master/Kind_k8s_Readme.md#test-kind)
+
+* ### Kind cluster with Node image version 1.23
+
+Looking at the [Kind releases](https://github.com/kubernetes-sigs/kind/releases), I noticed that even 1.23 is supported and i used it.
+
+Cluster creation works!
+![kind cluster with node image 1.23](kind/images/kind_cluster_1.23.drawio.svg)
+
+* ### Test network in worker node
+
+Need to install `iputils-ping` and `traceroute` package to test it
+
+1. google.com works
+
+    ```zsh
+    root@kind-airflow-worker:/ ping google.com
+    PING google.com (142.251.39.46) 56(84) bytes of data.
+    64 bytes from bud02s38-in-f14.1e100.net (142.251.39.46): icmp_seq=1 ttl=116 time=24.8 ms
+    ```
+
+2. How about registry-1.docker.io. It works too!!
+
+    ```zsh
+    root@kind-airflow-worker:/# traceroute registry-1.docker.io
+    traceroute to registry-1.docker.io (174.129.220.74), 30 hops max, 60 byte packets
+    1  172.19.0.1 (172.19.0.1)  0.182 ms  0.010 ms  0.006 ms
+    2  172.17.112.1 (172.17.112.1)  0.172 ms  0.408 ms  0.385 ms
+    3  192.168.1.1 (192.168.1.1)  2.623 ms  5.489 ms  2.559 ms
+    ```
+
+* ### Time to install airflow helm chart now
+
+```zsh
+$helm install $RELEASE_NAME apache-airflow/airflow --namespace $NS --debug
+install.go:178: [debug] Original chart version: ""
+....
+
+You can get Fernet Key value by running the following:
+
+    echo Fernet Key: $(kubectl get secret --namespace ns-airflow rn-airflow-fernet-key -o jsonpath="{.data.fernet-key}" | base64 --decode)
+
+###########################################################
+#  WARNING: You should set a static webserver secret key  #
+###########################################################
+
+You are using a dynamically generated webserver secret key, which can lead to
+unnecessary restarts of your Airflow components.
+
+Information on how to set a static webserver secret key can be found here:
+https://airflow.apache.org/docs/helm-chart/stable/production-guide.html#webserver-secret-key
+```
+
+**It works!**: Still don't know why the other one does not work
+
+**Lesson**: This is seems to be the way with new style of infrastructure. People just replace the version/number of some file/image and test if it works. If works then fine, if not then try another version/file/chart/yaml or whatever.
+
+It would appear that another layer of administrators/developers have been created who actually find root causes and solutions to when one these images do not work. While the "front facing admnistrators" just try to find which image works and do some little of tweaking by searching while lines in those yaml files to change. Maybe it is OK in the new environment. However, coming from the old setup, I would like to know why my application could not work in a given setup. And maybe that means I need to go to the another level of administrators?
+
+</details>
+
+## Access airflow frontend
+
+Follwing instructions provided by the helm chart installation output or as per instructions on [Airflow Quick Start documentaion](https://airflow.apache.org/docs/helm-chart/stable/quick-start.html), once can login to the Airflow webserver frontend
+
+1. Forward port from kubectl
+
+   ```zsh
+   kpf svc/$RELEASE_NAME-webserver 8080:8080 --namespace $NS
+   ```
+
+2. Open airflow webserver URL in webbrowser (In Windows) `localhost:8080`
+   ![airflow webserver in windows](images/airflow_webserver.drawio.svg)
+
+## Access Flower dashboard
+
+Follwing instructions provided by the helm chart installation output, one can login to the Airflow webserver frontend
+
+1. Forward port from kubectl
+
+   ```zsh
+   kpf svc/$RELEASE_NAME-flower 5555:5555 --namespace $NS
+   ```
+
+2. Open Flower dashboard URL in web browser (In Windows) `localhost:5555`
+   ![airflow flower dashboard in windows](images/airflow_flower.drawio.svg)
+
+## Access PostgreSQL DB
+
+1. Forward port from kubectl
+
+   ```zsh
+   kpf svc/$RELEASE_NAME-postgresql 5432:5432 --namespace $NS
+   ```
+
+2. Connect using preferred DB manager tool. I used DBeaver
+   ![Airflow DB connection](images/airflow_pgsql.drawio.svg)
