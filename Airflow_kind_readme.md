@@ -383,7 +383,7 @@ As I am new to kubernetes, kind, docker and not much of an expert of networking 
 
 * ### Kind cluster with Node image version 1.23
 
-Looking at the [Kind releases](https://github.com/kubernetes-sigs/kind/releases), I noticed that even 1.23 is supported and i used it.
+Looking at the [Kind releases](https://github.com/kubernetes-sigs/kind/releases), I noticed that even 1.23 is supported and I used it.
 
 Cluster creation works!
 ![kind cluster with node image 1.23](kind/images/kind_cluster_1.23.drawio.svg)
@@ -437,6 +437,17 @@ https://airflow.apache.org/docs/helm-chart/stable/production-guide.html#webserve
 **Lesson**: This is seems to be the way with new style of infrastructure. People just replace the version/number of some file/image and test if it works. If works then fine, if not then try another version/file/chart/yaml or whatever.
 
 It would appear that another layer of administrators/developers have been created who actually find root causes and solutions to when one these images do not work. While the "front facing admnistrators" just try to find which image works and do some little of tweaking by searching while lines in those yaml files to change. Maybe it is OK in the new environment. However, coming from the old setup, I would like to know why my application could not work in a given setup. And maybe that means I need to go to the another level of administrators?
+
+### Additional notes
+
+As I continued to work on it. I found there is some randomness somewhere which caused this network issues. I had issues with version 1.23 as well as 1.20.
+I had issues with Docker DNS configured to 8.8.8.8 as well as default entry as well.
+
+However, even when network was working Airflow installation will fail at times. Reason was that default helm command waits for 5minutes for a job to complete. In my case download of images was taking long time. So I changed the standard airflow installtion command to
+
+```zsh
+$helm install $RELEASE_NAME apache-airflow/airflow --namespace $NS --debug --timeout 10m
+```
 
 </details>
 
