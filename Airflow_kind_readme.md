@@ -358,16 +358,6 @@ start again
 
 16. But why? Where is the block for registry-1.docker.io in the original/default setup when everything else is working? This may be a search later, but for now need to see what can I need to change so that this change remains in the node image even when I delete the kind cluster and restart it. Is it a docker change or something need to be added to the kind cluster's config.yaml? as I change in docker then it will be for every docker/kind instance. Maybe better to find image/cluster specific solution.
 
-## Solved
-
-After 2 days of trying to find the rootcause of the issue, I tried to change change the Kind node images [Procedure details below](#alternate-way-change-the-node-image-version-once-again). That solution worked without problems.
-
-I came to this node image version again i.e. 1.20 and started the cluster again. This time I could reach out to the registry-1.docker.io!
-
-Once tested I tried to install airflow with helm and that worked as well!
-
-Temporary glitch or the node image version 1.23 changed somthing somewhere in the confgiuration? I have no clue, but for now I can reproduce the issue...
-
 
 </details>
 
@@ -443,11 +433,15 @@ It would appear that another layer of administrators/developers have been create
 As I continued to work on it. I found there is some randomness somewhere which caused this network issues. I had issues with version 1.23 as well as 1.20.
 I had issues with Docker DNS configured to 8.8.8.8 as well as default entry as well.
 
-However, even when network was working Airflow installation will fail at times. Reason was that default helm command waits for 5minutes for a job to complete. In my case download of images was taking long time. So I changed the standard airflow installtion command to
+However, even when network was working Airflow installation using helm will fail at times. To be specific helm command would fail, but if you check nodes, they were still working and after sometime all will be in running status. Trouble was that I could not log on to Airflow web frontend with standard user credentials.
+
+Reason was that default helm command waits for 5minutes for a job to complete. In my case download of images was taking long time. So helm command would fail and stop after 5 min and would not trigger the user creation job. So I changed the standard airflow installtion command to
 
 ```zsh
 $helm install $RELEASE_NAME apache-airflow/airflow --namespace $NS --debug --timeout 10m
 ```
+
+In this case helm would wait for job to complete and trigger the user creation job. 
 
 </details>
 
@@ -487,3 +481,11 @@ Follwing instructions provided by the helm chart installation output, one can lo
 
 2. Connect using preferred DB manager tool. I used DBeaver
    ![Airflow DB connection](images/airflow_pgsql.drawio.svg)
+
+## Export the WSL image
+
+Export this kind based Airflow image as a reference working image
+
+```powershell
+wsl --export deb11kindaf ./wsl_backups/deb11kindaf.tar | tar -czf ./wsl_backups/deb11kindaf.tar.gz ./wsl_backups/deb11kindaf.tar
+```
