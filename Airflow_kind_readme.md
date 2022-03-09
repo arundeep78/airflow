@@ -441,7 +441,7 @@ Reason was that default helm command waits for 5minutes for a job to complete. I
 $helm install $RELEASE_NAME apache-airflow/airflow --namespace $NS --debug --timeout 10m
 ```
 
-In this case helm would wait for job to complete and trigger the user creation job. 
+In this case helm would wait for job to complete and trigger the user creation job.
 
 </details>
 
