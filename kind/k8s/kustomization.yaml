@@ -1,0 +1,4 @@
+resources:
+- pv.yaml
+- pvc.yaml
+- storage_class.yaml

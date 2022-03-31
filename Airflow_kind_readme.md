@@ -456,7 +456,7 @@ Follwing instructions provided by the helm chart installation output or as per i
    ```
 
 2. Open airflow webserver URL in webbrowser (In Windows) `localhost:8080`
-   ![airflow webserver in windows](images/airflow_webserver.drawio.svg)
+   ![airflow webserver in windows](images/airflow/airflow_webserver.drawio.svg)
 
 ## Access Flower dashboard
 
@@ -469,7 +469,7 @@ Follwing instructions provided by the helm chart installation output, one can lo
    ```
 
 2. Open Flower dashboard URL in web browser (In Windows) `localhost:5555`
-   ![airflow flower dashboard in windows](images/airflow_flower.drawio.svg)
+   ![airflow flower dashboard in windows](images/airflow/airflow_flower.drawio.svg)
 
 ## Access PostgreSQL DB
 
@@ -480,7 +480,7 @@ Follwing instructions provided by the helm chart installation output, one can lo
    ```
 
 2. Connect using preferred DB manager tool. I used DBeaver
-   ![Airflow DB connection](images/airflow_pgsql.drawio.svg)
+   ![Airflow DB connection](images/airflow/airflow_pgsql.drawio.svg)
 
 ## Export the WSL image
 

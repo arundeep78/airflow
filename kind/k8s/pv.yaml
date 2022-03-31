@@ -1,0 +1,27 @@
+
+## Persistent volumne for PostgreSQL
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: data-postgres-pv
+  labels:
+    app: airflow
+spec:
+  capacity: 
+    storage: 2Gi
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: data-postgres-sc
+  local:
+    path: /data
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: postgres
+          operator: Exists
+#          operator: In
+#          values:
+#          - "true" 
