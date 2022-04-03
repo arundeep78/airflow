@@ -489,3 +489,49 @@ Export this kind based Airflow image as a reference working image
 ```powershell
 wsl --export deb11kindaf ./wsl_backups/deb11kindaf.tar | tar -czf ./wsl_backups/deb11kindaf.tar.gz ./wsl_backups/deb11kindaf.tar
 ```
+
+## Airflow with external PostgreSQL
+
+Above section was simply to have a default Airflow Helm chart installed on Kind cluster. In this section we attempt to customize Airflow installation with 2 main criteria.
+
+1. External PostgreSQL DB
+2. Github as DAG repository
+
+Purpose of both these section is to have Airflow installed with data persistence for both code/DAGs and Database.
+
+**NOTE:** I am not sure, yet if there is anything else that needs to have persistence configured in Airflow components. Will update this section as I move along.
+
+### External PostgreSQL DB
+
+This section is based on the [PostgreSQL setup](Postgres_Readme.md). Kind cluster in that configuration setup worker node with node and pod Affinity parameters for Database.
+
+To allow Airflow helm chart to connect with external database in this case the PostgreSQL configured above, I used below files in my `values_custom.yaml` file for Airflow helm chart.
+
+```yaml
+# Configuration for postgresql subchart
+# Not recommended for production. Disable
+postgresql:
+  enabled: false
+
+# Airflow database & redis config
+data:
+
+  # Otherwise pass connection values in
+  metadataConnection:
+    user: postgres  # directly entered
+    pass: postgres # this is coming from environment variable based on secret
+    protocol: postgresql
+    host: rn-postgres-postgresql #.default.svc.cluster.local # as configured by postgres helm chart. RN however is not templated now.
+    port: 5432
+    db: arcticrisk # as configured in postgres helm chart
+```
+
+This section provides connection details about the external DB. I know that I have password in plain text in this file. But this was the quickest way. I tried to pass the an evironment variable based on postgres helm chart secret. But realized that Airflow uses a secret which has a connection url based on the above information. As this URL is created at level of helm chart generation, in my awarness, it can use value from another secret inside Kubernetes.
+
+TODO:
+It seems if I want to pass a password field based on an existing secret, I would have to change the pod template definition first, so that connection string is build inside kubernetes rather than at helm level. This is what I think. Let's see what I find as I move further.
+
+## Github as DAG repository
+
+So as to save my DAG definitions on github and allow collaboration, I now need to configure Airflow helm chart to synch DAG filepath with github repository.
+

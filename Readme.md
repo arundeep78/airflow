@@ -5,7 +5,7 @@ This documentation is based on [offical documentation from airflow](https://airf
 Official Airflow documentation recommends Kind for local Kubernetes cluster. In this project I try to use different Kubernetes deployments to install airflow.
 In the process, I hope to also learn a little bit of configurations on each of Kubernetes implementations.
 
-
+* ## [PostgreSQL in Kubernetes](Postgres_Readme.md)
 * ## [Airflow in Kind Kubernetes](Airflow_kind_readme.md)
 * ## [Airflow in minikube Kubernetes](Airflow_minikube_readme.md)
 
