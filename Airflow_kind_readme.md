@@ -535,3 +535,22 @@ It seems if I want to pass a password field based on an existing secret, I would
 
 So as to save my DAG definitions on github and allow collaboration, I now need to configure Airflow helm chart to synch DAG filepath with github repository.
 
+I updated the below section in the `values_custom.yaml` file for dags to configure github repo.
+
+**NOTE:** At the time of writing (Apr 2022) this helm chart configuration supports out-of-box username and password based configuration for github repo. But github does not support it anymore since Aug 2021. So, unless someone can and wants to configure the base images, I think one needs to use a public repo for this helm chart.
+
+```yaml
+dags:
+  gitSync:
+    enabled: true
+    repo: https://github.com/arundeep78/airflow.git
+    branch: master
+    rev: HEAD
+    depth: 1
+    # the number of consecutive failures allowed before aborting
+    maxFailures: 1
+    # subpath within the repo where dags are located
+    # should be "" if dags are at repo root
+    subPath: "dags"
+```
+
