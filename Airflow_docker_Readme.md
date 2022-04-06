@@ -182,7 +182,7 @@ If I used `default` user then VSCode could not access terminal.
 Reason was that airflow image creates a `default` user with id = `AIRFLOW_UID` which does not have any default shell assigned to it.
 
 This led me to add below changes to `Dockerfile` for airflow image.
-This meant that `airflow` user has the same UID as my default user on host. Thus files created by these users are accessible on host as well as container. Also `airflow` user has a shell defined, so it worked with Vscode terminal as well. 
+This meant that `airflow` user has the same UID as my default user on host. Thus files created by these users are accessible on host as well as container. Also `airflow` user has a shell defined, so it worked with Vscode terminal as well.
 
 ```Dockerfile
 FROM apache/airflow:2.2.5
@@ -206,4 +206,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 ```
 
+Now it is possible to use this configuration to execute `Remote Containers: |Reopen in Container`
 
+![Open in remote container](images/airflow/airflow_vscode_devcontainer_docker.drawio.svg)
+
+Once opened in container, development can start in the dag folder.
+
+![Vscode in airflow container](images/airflow/airflow_vscode_devcontainer_terminal.drawio.svg)

@@ -18,12 +18,12 @@ data:
 
   # Otherwise pass connection values in
   metadataConnection:
-    user: postgres  # directly entered
-    pass: postgres # this is coming from environment variable based on secret
+    user: airflow  # directly entered
+    pass: airflow # this is coming from environment variable based on secret
     protocol: postgresql
-    host: rn-postgres-postgresql #.default.svc.cluster.local # as configured by postgres helm chart. RN however is not templated now.
+    host: rn-pgsql-postgresql #.default.svc.cluster.local # as configured by postgres helm chart. RN however is not templated now.
     port: 5432
-    db: arcticrisk # as configured in postgres helm chart
+    db: airflow # as configured in postgres helm chart
 
 # Git sync
 dags:
