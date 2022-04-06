@@ -27,7 +27,7 @@ from airflow.operators.bash import BashOperator
 from airflow.operators.dummy import DummyOperator
 
 with DAG(
-    dag_id='example_bash_operator_testgithub',
+    dag_id='example_bash_operator_testdevcontainer',
     schedule_interval='0 0 * * *',
     start_date=pendulum.datetime(2021, 1, 1, tz="UTC"),
     catchup=False,

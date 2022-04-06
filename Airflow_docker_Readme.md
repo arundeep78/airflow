@@ -74,7 +74,13 @@ services:
    
 ```
 
-### Create custom image with Docker file
+**Challenge:**: This caused a problem between host and docker IDs. Data persists in this hostpath even after cleanup. But, the postgres image has different user configuring this path. This caused future `docker-compose build` commands to fail due to permissions issue. To solve this, I have to execute below command everytime before calling `build`
+
+```zsh
+chown -R {hostuser} ./docker_airflow/pgdata
+```
+
+### Create custom image with Docker file using exta pip packages
 
 This I used to add new packages to the image. Other option is to use `_PIP_ADDITIONAL_REQUIREMENTS` parameter in .evn file and set additiona packages. But, I think this way once image is build it will be directly loaded locally rather then installing packages everytime.
 
@@ -103,3 +109,101 @@ x-airflow-common:
   #image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:2.2.5}
   build: .
 ```
+
+### Development container configuration with Vscode
+
+Now I have airflow
+
+* configured in Docker
+* it has persistent DB on host
+* it has dags and logs folder on host that can synched to github repo from host.
+
+Now, how to connect to this development environment
+
+* where dags can be developed,
+* have all python linting and help available and
+* DAG python file can be tested to check if it works with its configuration
+
+For this I needed help from
+
+* [Create development container using Docker compose](https://code.visualstudio.com/docs/remote/create-dev-container#_use-docker-compose)
+* [Add non-root user to a container](https://code.visualstudio.com/remote/advancedcontainers/add-nonroot-user)
+
+with the help of these documentation and trial and error, I configured below entries for `.devcontainer/devcontainer.json`
+
+```json
+  // For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+  // https://github.com/microsoft/vscode-dev-containers/tree/v0.231.3/containers/docker-from-docker-compose
+  {
+    "name": "Airflow DAG in docker",
+    "dockerComposeFile": "../docker_airflow/docker-compose.yaml",
+    "service": "airflow-scheduler",
+    "workspaceFolder": "/opt/airflow/dags",
+ 
+    // Set *default* container specific settings.json values on container create.
+    "settings": {
+      "terminal.integrated.profiles.linux": {
+        "bash": {
+          "path": "/bin/bash"
+        }
+      }
+    },
+
+    // Add the IDs of extensions you want installed when the container is created.
+    "extensions": [
+      "ms-azuretools.vscode-docker",
+      "ms-python.python",
+      "ms-python.vscode-pylance"
+    ],
+    // Comment out to connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
+    "remoteUser": "airflow",
+
+  // This was important as otherwise, everytime I closed/disconnected from container, it would shutdown the complete airflow environment
+    "shutdownAction": "none"
+  }
+```
+
+This configruation now
+
+1. Connects to a running docker container started from `docker-compose.yaml`. Container is referenced with `service name` defined in the file.
+2. It opens up the `DAGS` folder in the container to start the development.
+3. It loads VScode python extensions to have linting and other capabilities.
+4. Allow to write and test code in airflow environment
+
+Challenge was `remoteUser`. As per [airflow documentation](https://airflow.apache.org/docs/apache-airflow/stable/start/docker.html) and standard `docker-compose.yaml` file I should set `AIRFLOW_UID` in `.env`. I did that, but it caused problems when trying to connect to container using VScode remote containers.
+
+It turns out that if I specify remoteUser as `airflow`, it could not access certain paths. It would fail with error below
+
+```zsh
+/bin/sh: 15: cannot create /home/airflow/.vscode-server/data/Machine/.connection-token-e18005f0f1b33c29e81d732535d8c0e47cafb0b5-74f0c71b-a295-4c6d-9d1a-0f8842781a49: Permission denied
+```
+
+If I used `default` user then VSCode could not access terminal.
+Reason was that airflow image creates a `default` user with id = `AIRFLOW_UID` which does not have any default shell assigned to it.
+
+This led me to add below changes to `Dockerfile` for airflow image.
+This meant that `airflow` user has the same UID as my default user on host. Thus files created by these users are accessible on host as well as container. Also `airflow` user has a shell defined, so it worked with Vscode terminal as well. 
+
+```Dockerfile
+FROM apache/airflow:2.2.5
+
+# This was key to solve that development problem. 
+USER root
+
+ARG USERNAME=airflow
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+
+RUN groupadd --gid $USER_GID $USERNAME \
+    && usermod --uid $USER_UID --gid $USER_GID $USERNAME \
+    && chown -R $USER_UID:$USER_GID /home/$USERNAME
+
+USER ${USERNAME} 
+   
+RUN python -m pip install --upgrade pip
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+```
+
+
