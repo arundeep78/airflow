@@ -110,13 +110,13 @@ x-airflow-common:
   build: .
 ```
 
-### Development container configuration with Vscode
+### Development container configuration with VSCode
 
 Now I have airflow
 
 * configured in Docker
 * it has persistent DB on host
-* it has dags and logs folder on host that can synched to github repo from host.
+* it has dags and logs folder on host that can synced to github repo from host.
 
 Now, how to connect to this development environment
 
@@ -170,7 +170,7 @@ This configruation now
 3. It loads VScode python extensions to have linting and other capabilities.
 4. Allow to write and test code in airflow environment
 
-Challenge was `remoteUser`. As per [airflow documentation](https://airflow.apache.org/docs/apache-airflow/stable/start/docker.html) and standard `docker-compose.yaml` file I should set `AIRFLOW_UID` in `.env`. I did that, but it caused problems when trying to connect to container using VScode remote containers.
+**Challenge** was `remoteUser`. As per [airflow documentation](https://airflow.apache.org/docs/apache-airflow/stable/start/docker.html) and standard `docker-compose.yaml` file I should set `AIRFLOW_UID` in `.env`. I did that, but it caused problems when trying to connect to container using VScode remote containers.
 
 It turns out that if I specify remoteUser as `airflow`, it could not access certain paths. It would fail with error below
 

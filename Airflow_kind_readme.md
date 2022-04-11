@@ -490,18 +490,7 @@ Export this kind based Airflow image as a reference working image
 wsl --export deb11kindaf ./wsl_backups/deb11kindaf.tar | tar -czf ./wsl_backups/deb11kindaf.tar.gz ./wsl_backups/deb11kindaf.tar
 ```
 
-## Airflow with external PostgreSQL
-
-Above section was simply to have a default Airflow Helm chart installed on Kind cluster. In this section we attempt to customize Airflow installation with 2 main criteria.
-
-1. External PostgreSQL DB
-2. Github as DAG repository
-
-Purpose of both these section is to have Airflow installed with data persistence for both code/DAGs and Database.
-
-**NOTE:** I am not sure, yet if there is anything else that needs to have persistence configured in Airflow components. Will update this section as I move along.
-
-### External PostgreSQL DB
+## Airflow with external PostgreSQL DB
 
 This section is based on the [PostgreSQL setup](Postgres_Readme.md). Kind cluster in that configuration setup worker node with node and pod Affinity parameters for Database.
 
