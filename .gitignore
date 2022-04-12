@@ -1,3 +1,4 @@
 docker_airflow/pgdata
 docker_airflow/logs
 dags/__pycache__
+dags/siextent/__pycache__

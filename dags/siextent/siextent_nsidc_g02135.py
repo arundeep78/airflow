@@ -40,8 +40,8 @@ def update_sie_data():
   try:
     max_date= db_conn.get_first(f"SELECT MAX(datetime_date) FROM {tbl_name}")[0]
   except:
-    max_date = datetime.date(1950,1,1)
-    
+    max_date = datetime.datetime(1950,1,1)
+
   print(max_date)
 
 
