@@ -29,10 +29,19 @@ def update_sie_data():
 
 
   # %%
-  num_records_before= db_conn.get_first(sql=f"select count(*) from {tbl_name}")[0]
+  try:
+    num_records_before= db_conn.get_first(sql=f"select count(*) from {tbl_name}")[0]
+  
+  except:
+    num_records_before=0
+
   print(num_records_before)
 
-  max_date= db_conn.get_first(f"SELECT MAX(datetime_date) FROM {tbl_name}")[0]
+  try:
+    max_date= db_conn.get_first(f"SELECT MAX(datetime_date) FROM {tbl_name}")[0]
+  except:
+    max_date = datetime.date(1950,1,1)
+    
   print(max_date)
 
 
