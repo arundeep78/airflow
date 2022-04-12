@@ -2,7 +2,7 @@
 # a string is expected (can be templated).
 extraEnv: |
   - name: AIRFLOW__CORE__LOAD_EXAMPLES
-    value: 'True'
+    value: 'False'
 
 # Configuration for postgresql subchart
 # Not recommended for production. Disable
