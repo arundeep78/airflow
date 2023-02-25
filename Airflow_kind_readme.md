@@ -4,7 +4,7 @@ NOTE: This procedure is based on [Kind installation of K8s](https://github.com/a
 
 ## Create a directory structure for airflow project
 
-Create a directories for airflow project. These directories store configuration files for Helm chart for airflow, any image files that it might need, test DAGs etc. These files can be uploaded to github as needed.
+Create directries for airflow project. These directories store configuration files for Helm chart for airflow, any image files that it might need, test DAGs etc. These files can be uploaded to github as needed.
 
 You will follow your own project organization methods. This one I just throught might work for me. We shall see  :)
 
@@ -128,7 +128,7 @@ For some deleting the namespace and executing steps again worked. Windows restar
 
 I am in those for whom that trick did not work.
 
-Interestingly, in these issues once can find reference to articles with headlines " **Airflow in Kubernetes in 10 mins**". This IMO is one of the cause of such issues. People are led to beleive that all is just so simple.
+Interestingly, in these issues one can find reference to articles with headlines " **Airflow in Kubernetes in 10 mins**". This IMO is one of the cause of such issues. People are led to beleive that all is just so simple.
 
 ## Attempt 2 leading to same issue
 

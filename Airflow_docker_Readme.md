@@ -24,7 +24,7 @@ curl -LfO 'https://airflow.apache.org/docs/apache-airflow/2.2.5/docker-compose.y
 ### Setup local user
 
 ```zsh
-mkdir -p mkdir -p ../dags ./logs ./plugins ./pgdata
+mkdir -p ../dags ./logs ./plugins ./pgdata
 echo -e "AIRFLOW_UID=$(id -u)" > .env
 ```
 
